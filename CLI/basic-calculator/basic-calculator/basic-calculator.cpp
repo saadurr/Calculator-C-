@@ -8,6 +8,8 @@ int main()
     /*All variables to be used in this program*/
     char input = ' ', sign = ' ';
     char inparr[7] = { 'a', 's', 'm', 'd', 'e', 'x', 'q' };
+    string sciArr[7] = { "sin","cos","tan","cot","sec","csc","bk"};
+
     map <char, string> operationsNameMap = {
         {'a', "Addition"},
         {'s', "Subtraction"},
@@ -17,6 +19,16 @@ int main()
         {'x', "Scientific Menu"},
         {'q', "Quit"}
     };
+
+    map <string, string> sciOperationsNameMap = {
+        {"sin", "sine"},
+        {"cos", "cosine"},
+        {"tan", "tangent"},
+        {"cot", "cotangent"},
+        {"sec", "secant"},
+        {"csc", "cosecant"}
+    };
+
     map <char, char> operationsSignMap = {
         {'a', '+'},
         {'s', '-'},
@@ -24,11 +36,14 @@ int main()
         {'d', '/'},
         {'e', '^'}
     };
-    int validinp = -1, sizeArr = -1;
+
+    bool validSci = false;
+    int validinp = -1, sizeArr = -1, sizeSciArr = -1;
     double val1 = -9999, val2 = -9999, output = -9999;
-    string subMenu = "";
+    string subMenu = "", sciMenuInput = "";
 
     sizeArr = sizeof(inparr) / sizeof(inparr[0]);
+    sizeSciArr = sizeof(sciArr) / sizeof(sciArr[0]);
 
     printStartWindow();
     clearScreen();
@@ -53,13 +68,42 @@ int main()
             break;
         }
 
-        subMenu = operationsNameMap[input];
-        sign = operationsSignMap[input];
-        preprocessInput(val1, val2, input, subMenu, sign);
+        if (input == 'x')
+        {
+            while (sciMenuInput != "bk")
+            {
+                while (!validSci)
+                {
+                    printScientificMenu();
+                    
+                    cin >> sciMenuInput;
+                    transform(sciMenuInput.begin(), sciMenuInput.end(), sciMenuInput.begin(), ::tolower);
 
-        output = calculateEngine(input, val1, val2);
+                    validSci = validateSciInput(sciMenuInput, sciArr, sizeSciArr);
+                    if (!validSci) cout << "\n\t\tWrong Input. Please try again." << endl;
+                }
+                subMenu = sciOperationsNameMap[sciMenuInput];
 
-        displayOutput(subMenu, sign, output, val1, val2);
+                preprocessInput(val1, val2, input, sciMenuInput, sign);
+
+                output = calculateEngine(input, val1, val2, sciMenuInput);
+
+                displayOutput(subMenu, input, output, val1, val2);
+
+                validSci = false;
+                sciMenuInput = "";
+            }
+        }
+        else
+        {
+            subMenu = operationsNameMap[input];
+            sign = operationsSignMap[input];
+            preprocessInput(val1, val2, input, subMenu, sign);
+
+            output = calculateEngine(input, val1, val2, sciMenuInput);
+
+            displayOutput(subMenu, sign, output, val1, val2);
+        }
         
     }
     return 0;
